@@ -10,7 +10,7 @@ const CONFIG = {
     SESSION_COOKIE: "bRGC1QWQGAR4Fg1dvbtvp5qH9JjXfVn4D7ns6YTV0SimIrO2oOePYJnLd6XsIxR5icCiTk8IjjHxg19pLd7NNZMQOdIcGVtGJNgr",
     
     // Your server ID (find it from URL: https://aternos.org/server/#YOUR_SERVER_ID)
-    SERVER_ID: "YOUR_SERVER_ID_HERE",
+    SERVER_ID: "oFfmBQRB0LWUV4wS",
     
     // How often to check server (in milliseconds)
     // 300000 = 5 minutes (Aternos gives ~5-10 minutes before shutdown warning)
