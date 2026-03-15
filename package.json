@@ -1,12 +1,9 @@
 {
-  "name": "aternos-vercel-bot",
+  "name": "aternos-bot-manager",
   "version": "1.0.0",
-  "description": "Aternos 24/7 bot for Vercel",
+  "description": "Aternos Server Manager with Always Online Bot",
   "dependencies": {
     "puppeteer-core": "^21.5.0",
     "@sparticuz/chromium": "^119.0.0"
-  },
-  "scripts": {
-    "vercel-build": "echo hello"
   }
 }
