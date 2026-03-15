@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aternos Bot Manager</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Aternos Bot Manager</h1>
+            <p>Select a server and enable Always Online mode</p>
+        </header>
+
+        <div class="session-section">
+            <h3>Session Cookie</h3>
+            <div class="session-input">
+                <input type="text" id="sessionCookie" 
+                       placeholder="Enter your ATERNOS_SESSION cookie" 
+                       value="bRGC1QWQGAR4Fg1dvbtvp5qH9JjXfVn4D7ns6YTV0SimIrO2oOePYJnLd6XsIxR5icCiTk8IjjHxg19pLd7NNZMQOdIcGVtGJNgr">
+                <button id="loadServersBtn">📋 Load My Servers</button>
+            </div>
+        </div>
+
+        <div class="servers-section" id="serversSection" style="display: none;">
+            <h3>Your Servers</h3>
+            <div class="servers-grid" id="serversGrid">
+                <!-- Servers will be loaded here -->
+            </div>
+        </div>
+
+        <div class="control-section" id="controlSection" style="display: none;">
+            <h3>Server Control: <span id="selectedServerName"></span></h3>
+            <div class="server-details">
+                <p><strong>Server ID:</strong> <span id="selectedServerId"></span></p>
+                <p><strong>Status:</strong> <span id="serverStatus" class="status-offline">Unknown</span></p>
+                <p><strong>Players:</strong> <span id="serverPlayers">0/20</span></p>
+                <p><strong>Software:</strong> <span id="serverSoftware">-</span></p>
+            </div>
+
+            <div class="control-buttons">
+                <button id="refreshStatusBtn" class="btn-secondary">🔄 Refresh Status</button>
+                <button id="startServerBtn" class="btn-primary">▶️ Start Server</button>
+                <button id="stopServerBtn" class="btn-danger">⏹️ Stop Server</button>
+            </div>
+
+            <div class="always-online-section">
+                <h4>🤖 Always Online Mode</h4>
+                <p class="info-text">When enabled, bot will automatically click the +1 minute button every time it appears (59 seconds before shutdown)</p>
+                
+                <div class="toggle-switch">
+                    <label class="switch">
+                        <input type="checkbox" id="alwaysOnlineToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span id="toggleLabel">Enable Always Online</span>
+                </div>
+
+                <div class="bot-status" id="botStatus" style="display: none;">
+                    <h5>Bot Activity:</h5>
+                    <div class="bot-log" id="botLog">
+                        <!-- Bot logs will appear here -->
+                    </div>
+                    <p class="last-action">Last action: <span id="lastAction">None</span></p>
+                    <p class="next-check">Next +1 check: <span id="nextCheck">-</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="logs-section" id="logsSection" style="display: none;">
+            <h3>📝 Activity Log</h3>
+            <div class="activity-log" id="activityLog"></div>
+        </div>
+    </div>
+
+    <script src="/public/script.js"></script>
+</body>
+</html>
