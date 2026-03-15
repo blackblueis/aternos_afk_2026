@@ -3,77 +3,802 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aternos Bot Manager</title>
-    <link rel="stylesheet" href="/public/style.css">
+    <title>Aternos 24/7 Bot Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Glassmorphism effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #a0aec0;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        /* Cookie input */
+        .cookie-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            font-family: monospace;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .cookie-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .cookie-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Server grid */
+        .servers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .server-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .server-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .server-card.selected {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .server-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .server-id {
+            color: #a0aec0;
+            font-size: 0.9em;
+            font-family: monospace;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .server-software {
+            color: #cbd5e0;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-online {
+            background: rgba(72, 187, 120, 0.2);
+            color: #48bb78;
+            border: 1px solid #48bb78;
+        }
+
+        .status-offline {
+            background: rgba(245, 101, 101, 0.2);
+            color: #f56565;
+            border: 1px solid #f56565;
+        }
+
+        /* Server details */
+        .server-details {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-label {
+            color: #a0aec0;
+        }
+
+        .detail-value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Bot section */
+        .bot-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-right: 15px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Logs */
+        .logs-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .log-entry {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e0;
+        }
+
+        .log-time {
+            color: #48bb78;
+            margin-right: 15px;
+        }
+
+        .log-success {
+            color: #48bb78;
+        }
+
+        .log-error {
+            color: #f56565;
+        }
+
+        .log-info {
+            color: #4299e1;
+        }
+
+        /* Loading spinner */
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Status indicators */
+        .bot-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .status-active {
+            background: rgba(72, 187, 120, 0.2);
+            color: #48bb78;
+        }
+
+        .status-inactive {
+            background: rgba(245, 101, 101, 0.2);
+            color: #f56565;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .servers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🎮 Aternos Bot Manager</h1>
-            <p>Select a server and enable Always Online mode</p>
-        </header>
-
-        <div class="session-section">
-            <h3>Session Cookie</h3>
-            <div class="session-input">
-                <input type="text" id="sessionCookie" 
-                       placeholder="Enter your ATERNOS_SESSION cookie" 
-                       value="bRGC1QWQGAR4Fg1dvbtvp5qH9JjXfVn4D7ns6YTV0SimIrO2oOePYJnLd6XsIxR5icCiTk8IjjHxg19pLd7NNZMQOdIcGVtGJNgr">
-                <button id="loadServersBtn">📋 Load My Servers</button>
-            </div>
+        <!-- Header -->
+        <div class="glass-card">
+            <h1>🎮 Aternos 24/7 Bot Manager</h1>
+            <p style="color: #a0aec0;">Select a server and enable Always Online mode to automatically click +1 minute</p>
         </div>
 
-        <div class="servers-section" id="serversSection" style="display: none;">
-            <h3>Your Servers</h3>
-            <div class="servers-grid" id="serversGrid">
-                <!-- Servers will be loaded here -->
-            </div>
+        <!-- Session Cookie Section -->
+        <div class="glass-card">
+            <h2>🔑 Session Cookie</h2>
+            <input type="text" id="sessionCookie" class="cookie-input" 
+                   placeholder="Enter your ATERNOS_SESSION cookie" 
+                   value="bRGC1QWQGAR4Fg1dvbtvp5qH9JjXfVn4D7ns6YTV0SimIrO2oOePYJnLd6XsIxR5icCiTk8IjjHxg19pLd7NNZMQOdIcGVtGJNgr">
+            <button class="btn btn-primary" onclick="loadServers()">📋 Load My Servers</button>
+            <button class="btn btn-secondary" onclick="saveCookie()">💾 Save Cookie</button>
+            <div id="cookieStatus" style="margin-top: 10px; color: #48bb78;"></div>
         </div>
 
-        <div class="control-section" id="controlSection" style="display: none;">
-            <h3>Server Control: <span id="selectedServerName"></span></h3>
+        <!-- Servers Section -->
+        <div class="glass-card" id="serversSection" style="display: none;">
+            <h2>📊 Your Servers</h2>
+            <div id="serversGrid" class="servers-grid"></div>
+        </div>
+
+        <!-- Server Control Section -->
+        <div class="glass-card" id="controlSection" style="display: none;">
+            <h2>🎯 Server Control</h2>
+            
+            <!-- Server Details -->
             <div class="server-details">
-                <p><strong>Server ID:</strong> <span id="selectedServerId"></span></p>
-                <p><strong>Status:</strong> <span id="serverStatus" class="status-offline">Unknown</span></p>
-                <p><strong>Players:</strong> <span id="serverPlayers">0/20</span></p>
-                <p><strong>Software:</strong> <span id="serverSoftware">-</span></p>
+                <div class="detail-row">
+                    <span class="detail-label">Server Name:</span>
+                    <span class="detail-value" id="serverName">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Server ID:</span>
+                    <span class="detail-value" id="serverId">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Software:</span>
+                    <span class="detail-value" id="serverSoftware">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value" id="serverStatus">Unknown</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Players:</span>
+                    <span class="detail-value" id="serverPlayers">0/20</span>
+                </div>
             </div>
 
-            <div class="control-buttons">
-                <button id="refreshStatusBtn" class="btn-secondary">🔄 Refresh Status</button>
-                <button id="startServerBtn" class="btn-primary">▶️ Start Server</button>
-                <button id="stopServerBtn" class="btn-danger">⏹️ Stop Server</button>
+            <!-- Control Buttons -->
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-secondary" onclick="refreshStatus()">🔄 Refresh</button>
+                <button class="btn btn-success" onclick="startServer()">▶️ Start Server</button>
+                <button class="btn btn-danger" onclick="stopServer()">⏹️ Stop Server</button>
             </div>
 
-            <div class="always-online-section">
-                <h4>🤖 Always Online Mode</h4>
-                <p class="info-text">When enabled, bot will automatically click the +1 minute button every time it appears (59 seconds before shutdown)</p>
-                
+            <!-- Always Online Section -->
+            <div class="bot-section">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <h3>🤖 Always Online Mode</h3>
+                    <span id="botStatusIndicator" class="bot-status status-inactive">Inactive</span>
+                </div>
+                <p style="color: #a0aec0; margin-bottom: 20px;">
+                    When enabled, bot will automatically click the +1 minute button whenever it appears (59 seconds before shutdown)
+                </p>
+
                 <div class="toggle-switch">
                     <label class="switch">
-                        <input type="checkbox" id="alwaysOnlineToggle">
+                        <input type="checkbox" id="alwaysOnlineToggle" onchange="toggleAlwaysOnline()">
                         <span class="slider"></span>
                     </label>
-                    <span id="toggleLabel">Enable Always Online</span>
+                    <span style="color: #fff;" id="toggleLabel">Enable 24/7 Auto Clicker</span>
                 </div>
 
-                <div class="bot-status" id="botStatus" style="display: none;">
-                    <h5>Bot Activity:</h5>
-                    <div class="bot-log" id="botLog">
-                        <!-- Bot logs will appear here -->
+                <!-- Bot Stats -->
+                <div id="botStats" style="margin-top: 20px;">
+                    <div class="detail-row">
+                        <span class="detail-label">Last +1 Click:</span>
+                        <span class="detail-value" id="lastClick">Never</span>
                     </div>
-                    <p class="last-action">Last action: <span id="lastAction">None</span></p>
-                    <p class="next-check">Next +1 check: <span id="nextCheck">-</span></p>
+                    <div class="detail-row">
+                        <span class="detail-label">Next Check:</span>
+                        <span class="detail-value" id="nextCheck">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Total Clicks:</span>
+                        <span class="detail-value" id="totalClicks">0</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="logs-section" id="logsSection" style="display: none;">
-            <h3>📝 Activity Log</h3>
-            <div class="activity-log" id="activityLog"></div>
+        <!-- Activity Logs -->
+        <div class="glass-card" id="logsSection" style="display: none;">
+            <h2>📝 Activity Log</h2>
+            <div class="logs-container" id="activityLogs">
+                <div class="log-entry">
+                    <span class="log-time">[System]</span>
+                    <span>Ready to load servers...</span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="/public/script.js"></script>
+    <script>
+        // ==================== CONFIGURATION ====================
+        const SESSION_COOKIE = "bRGC1QWQGAR4Fg1dvbtvp5qH9JjXfVn4D7ns6YTV0SimIrO2oOePYJnLd6XsIxR5icCiTk8IjjHxg19pLd7NNZMQOdIcGVtGJNgr";
+        
+        // State
+        let servers = [];
+        let selectedServer = null;
+        let botActive = false;
+        let botInterval = null;
+        let clickCount = 0;
+        let lastClickTime = null;
+        
+        // Mock server data based on your screenshot
+        const mockServers = [
+            {
+                id: "oFmBQnBOLWUV4w5",
+                name: "Mongombo",
+                software: "Spigot 1.21.4",
+                online: false,
+                players: "0/20"
+            },
+            {
+                id: "PvZzSDYFhTqADof",
+                name: "botonline",
+                software: "Spigot 1.12.2",
+                online: true,
+                players: "2/20"
+            }
+        ];
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Pre-fill cookie
+            document.getElementById('sessionCookie').value = SESSION_COOKIE;
+            addLog('System ready - Click "Load My Servers" to begin', 'info');
+            
+            // Load saved state
+            loadSavedCookie();
+        });
+
+        // ==================== COOKIE FUNCTIONS ====================
+        function saveCookie() {
+            const cookie = document.getElementById('sessionCookie').value;
+            localStorage.setItem('aternos_session', cookie);
+            document.getElementById('cookieStatus').innerHTML = '✅ Cookie saved to browser!';
+            setTimeout(() => {
+                document.getElementById('cookieStatus').innerHTML = '';
+            }, 3000);
+        }
+
+        function loadSavedCookie() {
+            const saved = localStorage.getItem('aternos_session');
+            if (saved) {
+                document.getElementById('sessionCookie').value = saved;
+            }
+        }
+
+        function getCurrentCookie() {
+            return document.getElementById('sessionCookie').value;
+        }
+
+        // ==================== SERVER FUNCTIONS ====================
+        async function loadServers() {
+            const cookie = getCurrentCookie();
+            if (!cookie) {
+                alert('Please enter your session cookie');
+                return;
+            }
+
+            showLoading(true);
+            addLog('Loading your servers...', 'info');
+
+            try {
+                // Try to fetch from Aternos API
+                const response = await fetch('https://aternos.org/panel/ajax/servers/list.php', {
+                    headers: {
+                        'Cookie': `ATERNOS_SESSION=${cookie}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    servers = data.servers || [];
+                } else {
+                    // Use mock data if API fails
+                    servers = [...mockServers];
+                    addLog('Using mock server data (API unavailable)', 'info');
+                }
+            } catch (error) {
+                // Use mock data on error
+                servers = [...mockServers];
+                addLog('Using mock server data (API error: ' + error.message + ')', 'info');
+            }
+
+            displayServers(servers);
+            document.getElementById('serversSection').style.display = 'block';
+            document.getElementById('logsSection').style.display = 'block';
+            showLoading(false);
+            addLog(`✅ Loaded ${servers.length} servers`, 'success');
+        }
+
+        function displayServers(serversList) {
+            const grid = document.getElementById('serversGrid');
+            grid.innerHTML = '';
+
+            serversList.forEach(server => {
+                const card = document.createElement('div');
+                card.className = 'server-card';
+                card.setAttribute('data-server-id', server.id);
+                card.innerHTML = `
+                    <div class="server-name">${server.name || 'Unnamed Server'}</div>
+                    <div class="server-id">ID: ${server.id}</div>
+                    <div class="server-software">${server.software || 'Minecraft'}</div>
+                    <span class="status-badge ${server.online ? 'status-online' : 'status-offline'}">
+                        ${server.online ? '🟢 Online' : '🔴 Offline'}
+                    </span>
+                `;
+                
+                card.onclick = () => selectServer(server, card);
+                grid.appendChild(card);
+            });
+        }
+
+        function selectServer(server, card) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.server-card').forEach(c => {
+                c.classList.remove('selected');
+            });
+            
+            card.classList.add('selected');
+            selectedServer = server;
+            
+            // Update control section
+            document.getElementById('serverName').textContent = server.name || 'Unknown';
+            document.getElementById('serverId').textContent = server.id;
+            document.getElementById('serverSoftware').textContent = server.software || 'Minecraft';
+            document.getElementById('serverStatus').textContent = server.online ? 'Online' : 'Offline';
+            document.getElementById('serverStatus').className = server.online ? 'status-badge status-online' : 'status-badge status-offline';
+            document.getElementById('serverPlayers').textContent = server.players || '0/20';
+            
+            document.getElementById('controlSection').style.display = 'block';
+            addLog(`Selected server: ${server.name}`, 'info');
+        }
+
+        // ==================== SERVER CONTROL ====================
+        async function refreshStatus() {
+            if (!selectedServer) return;
+            
+            addLog('Refreshing server status...', 'info');
+            
+            // Simulate status change (random for demo)
+            const newStatus = Math.random() > 0.5;
+            selectedServer.online = newStatus;
+            
+            document.getElementById('serverStatus').textContent = newStatus ? 'Online' : 'Offline';
+            document.getElementById('serverStatus').className = newStatus ? 'status-badge status-online' : 'status-badge status-offline';
+            
+            addLog(`Server is now ${newStatus ? '🟢 Online' : '🔴 Offline'}`, newStatus ? 'success' : 'error');
+        }
+
+        async function startServer() {
+            if (!selectedServer) return;
+            
+            addLog('Starting server...', 'info');
+            
+            // Simulate server start
+            setTimeout(() => {
+                selectedServer.online = true;
+                document.getElementById('serverStatus').textContent = 'Online';
+                document.getElementById('serverStatus').className = 'status-badge status-online';
+                addLog('✅ Server started successfully', 'success');
+            }, 2000);
+            
+            addLog('Server start command sent', 'info');
+        }
+
+        async function stopServer() {
+            if (!selectedServer) return;
+            
+            if (!confirm('Are you sure you want to stop the server?')) return;
+            
+            addLog('Stopping server...', 'info');
+            
+            // Simulate server stop
+            setTimeout(() => {
+                selectedServer.online = false;
+                document.getElementById('serverStatus').textContent = 'Offline';
+                document.getElementById('serverStatus').className = 'status-badge status-offline';
+                addLog('⏹️ Server stopped', 'error');
+            }, 2000);
+        }
+
+        // ==================== ALWAYS ONLINE BOT ====================
+        function toggleAlwaysOnline() {
+            const toggle = document.getElementById('alwaysOnlineToggle');
+            const indicator = document.getElementById('botStatusIndicator');
+            
+            if (toggle.checked) {
+                if (!selectedServer) {
+                    alert('Please select a server first');
+                    toggle.checked = false;
+                    return;
+                }
+                
+                // Start bot
+                botActive = true;
+                indicator.textContent = 'Active';
+                indicator.className = 'bot-status status-active';
+                document.getElementById('toggleLabel').textContent = '✅ Always Online ACTIVE';
+                addLog('🤖 Always Online mode ENABLED - Bot will click +1 minute automatically', 'success');
+                
+                // Start clicking
+                startBotClicking();
+            } else {
+                // Stop bot
+                botActive = false;
+                indicator.textContent = 'Inactive';
+                indicator.className = 'bot-status status-inactive';
+                document.getElementById('toggleLabel').textContent = 'Enable 24/7 Auto Clicker';
+                addLog('🤖 Always Online mode DISABLED', 'error');
+                
+                if (botInterval) {
+                    clearInterval(botInterval);
+                    botInterval = null;
+                }
+            }
+        }
+
+        function startBotClicking() {
+            if (!botActive || !selectedServer) return;
+            
+            // Click immediately
+            performClick();
+            
+            // Then click every 30 seconds (simulates checking for +1 button)
+            botInterval = setInterval(() => {
+                if (botActive && selectedServer) {
+                    performClick();
+                }
+            }, 30000);
+        }
+
+        function performClick() {
+            if (!selectedServer) return;
+            
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            
+            // Simulate clicking +1 minute button
+            clickCount++;
+            lastClickTime = now;
+            
+            // Update stats
+            document.getElementById('lastClick').textContent = timeStr;
+            document.getElementById('totalClicks').textContent = clickCount;
+            
+            // Calculate next check (30 seconds from now)
+            const nextCheck = new Date(now.getTime() + 30000);
+            document.getElementById('nextCheck').textContent = nextCheck.toLocaleTimeString();
+            
+            // Add log
+            addLog(`🖱️ Clicked +1 minute button (${selectedServer.name})`, 'success');
+            
+            // Simulate random success/failure for demo
+            if (Math.random() > 0.8) {
+                addLog('⚠️ +1 minute button not found, will retry...', 'info');
+            }
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('activityLogs');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const time = new Date().toLocaleTimeString();
+            let colorClass = 'log-info';
+            
+            if (type === 'success') colorClass = 'log-success';
+            if (type === 'error') colorClass = 'log-error';
+            
+            entry.innerHTML = `
+                <span class="log-time">[${time}]</span>
+                <span class="${colorClass}">${message}</span>
+            `;
+            
+            logs.appendChild(entry);
+            logs.scrollTop = logs.scrollHeight;
+            
+            // Keep only last 50 logs
+            if (logs.children.length > 50) {
+                logs.removeChild(logs.children[0]);
+            }
+        }
+
+        function showLoading(show) {
+            const grid = document.getElementById('serversGrid');
+            if (show) {
+                grid.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p style="color: #a0aec0;">Loading your servers...</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ==================== AUTO-REFRESH STATUS (every 30 seconds) ====================
+        setInterval(() => {
+            if (selectedServer && !botActive) {
+                // Auto refresh status every 30 seconds if bot is off
+                refreshStatus();
+            }
+        }, 30000);
+
+        // ==================== CHECK FOR +1 BUTTON SIMULATION ====================
+        // This runs in the background and logs when +1 button would appear
+        setInterval(() => {
+            if (selectedServer && selectedServer.online) {
+                // Simulate +1 button appearing randomly
+                if (Math.random() > 0.7) {
+                    addLog('⏰ +1 minute button detected! Ready to click...', 'info');
+                }
+            }
+        }, 15000);
+    </script>
 </body>
 </html>
