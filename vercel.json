@@ -1,13 +1,10 @@
 {
   "functions": {
-    "api/bot.js": {
+    "api/always-online.js": {
       "maxDuration": 60
     }
   },
-  "crons": [
-    {
-      "path": "/api/keep-alive",
-      "schedule": "*/5 * * * *"
-    }
+  "rewrites": [
+    { "source": "/", "destination": "/public/index.html" }
   ]
 }
