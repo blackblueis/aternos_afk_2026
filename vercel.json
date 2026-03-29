@@ -2,10 +2,6 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/control.js",
-      "use": "@vercel/node"
-    },
-    {
       "src": "always-online.js",
       "use": "@vercel/node"
     }
@@ -13,7 +9,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/"
+      "dest": "always-online.js"
     }
   ]
 }
