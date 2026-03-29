@@ -1,18 +1,9 @@
-{
-  "name": "crafting-lands-24h",
-  "version": "1.1.0",
-  "description": "Aternos 24/7 Bot para Bedrock Edition",
-  "main": "always-online.js",
-  "dependencies": {
-    "express": "^4.18.2",
-    "axios": "^1.6.0",
-    "cheerio": "^1.0.0-rc.12",
-    "mineflayer": "latest",
-    "bedrock-protocol": "latest",
-    "puppeteer-core": "latest",
-    "@sparticuz/chromium": "latest"
-  },
-  "scripts": {
-    "start": "node always-online.js"
-  }
+"dependencies": {
+  "express": "^4.18.2",
+  "axios": "^1.6.0",
+  "cheerio": "^1.0.0-rc.12",
+  "mineflayer": "latest",
+  "bedrock-protocol": "latest",
+  "puppeteer-core": "^22.0.0",
+  "@sparticuz/chromium-min": "latest"
 }
