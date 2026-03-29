@@ -1,10 +1,19 @@
 {
-  "functions": {
-    "api/always-online.js": {
-      "maxDuration": 60
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/control.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "always-online.js",
+      "use": "@vercel/node"
     }
-  },
-  "rewrites": [
-    { "source": "/", "destination": "/public/index.html" }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
   ]
 }
