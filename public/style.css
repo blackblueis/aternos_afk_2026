@@ -1,384 +1,72 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craft Lands | Bot Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CRAFT LANDS</h1>
+            <p>Gerenciador de Servidores Aternos</p>
+        </header>
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    padding: 20px;
-}
+        <div class="session-section">
+            <h3>🔑 Configuração de Sessão</h3>
+            <div class="session-input">
+                <input type="text" id="sessionCookie" placeholder="Cole seu cookie ATERNOS_SESSION aqui...">
+                <button id="loadServersBtn" onclick="loadServers()">Carregar Servidores</button>
+            </div>
+        </div>
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    padding: 30px;
-}
+        <div class="servers-section" id="serversSection" style="display: none;">
+            <h3>📊 Seus Servidores</h3>
+            <div id="serversGrid" class="servers-grid"></div>
+        </div>
 
-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
+        <div class="control-section" id="controlSection" style="display: none;">
+            <h3>🎯 Controle do Servidor: <span id="selectedServerName">---</span></h3>
+            
+            <div class="server-details">
+                <p><strong>ID:</strong> <span id="selectedServerId">--</span></p>
+                <p><strong>Status:</strong> <span id="serverStatus" class="status-badge">--</span></p>
+                <p><strong>Jogadores:</strong> <span id="serverPlayers">0/0</span></p>
+                <p><strong>Software:</strong> <span id="serverSoftware">--</span></p>
+            </div>
 
-header h1 {
-    color: #333;
-    font-size: 2.5em;
-    margin-bottom: 10px;
-}
+            <div class="control-buttons">
+                <button class="btn-primary" id="startServerBtn" onclick="startServer()">▶️ Ligar</button>
+                <button class="btn-danger" id="stopServerBtn" onclick="stopServer()">⏹️ Desligar</button>
+                <button class="btn-secondary" id="refreshStatusBtn" onclick="refreshStatus()">🔄 Atualizar</button>
+            </div>
 
-header p {
-    color: #666;
-    font-size: 1.1em;
-}
+            <div class="always-online-section">
+                <h4>🤖 Bot Always Online (Anti-AFK)</h4>
+                <p class="info-text">O bot verificará o servidor a cada 30 segundos para evitar que ele desligue sozinho.</p>
+                <div class="toggle-switch">
+                    <label class="switch">
+                        <input type="checkbox" id="alwaysOnlineToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span id="toggleLabel">Ativar Bot 24/7</span>
+                </div>
 
-.session-section {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-}
+                <div class="bot-status" id="botStatus" style="display: none;">
+                    <div class="last-action">Última ação: <span id="lastAction">Nenhuma</span></div>
+                    <div class="next-check">Próxima verificação: <span id="nextCheck">--:--:--</span></div>
+                    <div class="bot-log" id="botLog"></div>
+                </div>
+            </div>
+        </div>
 
-.session-section h3 {
-    color: #333;
-    margin-bottom: 15px;
-}
+        <div class="logs-section" id="logsSection" style="display: none;">
+            <h3>📝 Log de Atividades</h3>
+            <div class="activity-log" id="activityLogs"></div>
+        </div>
+    </div>
 
-.session-input {
-    display: flex;
-    gap: 10px;
-}
-
-.session-input input {
-    flex: 1;
-    padding: 15px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: monospace;
-}
-
-.session-input button {
-    padding: 15px 30px;
-    background: #667eea;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background 0.3s;
-}
-
-.session-input button:hover {
-    background: #5a67d8;
-}
-
-.servers-section {
-    margin-bottom: 30px;
-}
-
-.servers-section h3 {
-    color: #333;
-    margin-bottom: 15px;
-}
-
-.servers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 15px;
-}
-
-.server-card {
-    background: white;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 15px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.server-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    border-color: #667eea;
-}
-
-.server-card.selected {
-    border-color: #667eea;
-    background: #f0f4ff;
-}
-
-.server-name {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
-}
-
-.server-id {
-    color: #666;
-    font-size: 0.9em;
-    font-family: monospace;
-    margin-bottom: 5px;
-}
-
-.server-software {
-    color: #888;
-    font-size: 0.9em;
-    margin-bottom: 10px;
-}
-
-.server-status-badge {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 0.9em;
-    font-weight: bold;
-}
-
-.status-online {
-    background: #c6f6d5;
-    color: #22543d;
-}
-
-.status-offline {
-    background: #fed7d7;
-    color: #742a2a;
-}
-
-.control-section {
-    background: #f8f9fa;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-}
-
-.control-section h3 {
-    color: #333;
-    margin-bottom: 20px;
-}
-
-.server-details {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-.server-details p {
-    margin: 10px 0;
-    color: #555;
-}
-
-.control-buttons {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
-}
-
-.btn-primary {
-    padding: 12px 24px;
-    background: #48bb78;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background 0.3s;
-}
-
-.btn-primary:hover {
-    background: #38a169;
-}
-
-.btn-secondary {
-    padding: 12px 24px;
-    background: #718096;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s;
-}
-
-.btn-secondary:hover {
-    background: #4a5568;
-}
-
-.btn-danger {
-    padding: 12px 24px;
-    background: #f56565;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s;
-}
-
-.btn-danger:hover {
-    background: #e53e3e;
-}
-
-.always-online-section {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-}
-
-.always-online-section h4 {
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.info-text {
-    color: #666;
-    font-size: 0.95em;
-    margin-bottom: 20px;
-    padding: 10px;
-    background: #ebf8ff;
-    border-radius: 6px;
-}
-
-.toggle-switch {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #48bb78;
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-.bot-status {
-    background: #1a202c;
-    color: #a0aec0;
-    padding: 15px;
-    border-radius: 6px;
-    font-family: monospace;
-}
-
-.bot-log {
-    max-height: 200px;
-    overflow-y: auto;
-    margin-bottom: 15px;
-    padding: 10px;
-    background: #2d3748;
-    border-radius: 4px;
-}
-
-.log-entry {
-    padding: 5px;
-    border-bottom: 1px solid #4a5568;
-    color: #cbd5e0;
-    font-size: 0.9em;
-}
-
-.log-entry .time {
-    color: #68d391;
-    margin-right: 10px;
-}
-
-.log-entry .action {
-    color: #63b3ed;
-}
-
-.last-action, .next-check {
-    margin: 5px 0;
-    color: #cbd5e0;
-}
-
-.logs-section {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 12px;
-}
-
-.logs-section h3 {
-    color: #333;
-    margin-bottom: 15px;
-}
-
-.activity-log {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    max-height: 200px;
-    overflow-y: auto;
-    font-family: monospace;
-    font-size: 0.9em;
-}
-
-.activity-entry {
-    padding: 8px;
-    border-bottom: 1px solid #e0e0e0;
-    color: #555;
-}
-
-.activity-entry .time {
-    color: #48bb78;
-    margin-right: 15px;
-}
-
-.loading {
-    text-align: center;
-    padding: 40px;
-    color: #666;
-}
-
-.error {
-    color: #e53e3e;
-    padding: 10px;
-    background: #fed7d7;
-    border-radius: 6px;
-    margin: 10px 0;
-}
+    <script src="script.js"></script>
+</body>
+</html>
