@@ -4,136 +4,139 @@ let botActive = false;
 let botInterval = null;
 let sessionCookie = '';
 
-// Elementos do DOM
+// Elementos do DOM (Sincronizados com seu CSS)
 const sessionInput = document.getElementById('sessionCookie');
 const serversSection = document.getElementById('serversSection');
 const serversGrid = document.getElementById('serversGrid');
 const controlSection = document.getElementById('controlSection');
-const activityLog = document.getElementById('activityLogs'); // Ajustado para o ID do seu HTML
+const logsSection = document.getElementById('logsSection');
+const activityLogs = document.getElementById('activityLogs');
+const botStatus = document.getElementById('botStatus');
+const botLog = document.getElementById('botLog');
 
-// Carregar servidores ao clicar
+// Carregar servidores
 async function loadServers() {
     sessionCookie = sessionInput.value.trim();
     if (!sessionCookie) {
-        alert('Por favor, insira seu cookie de sessão');
+        alert('Por favor, cole o seu cookie ATERNOS_SESSION');
         return;
     }
     
-    serversGrid.innerHTML = '<div class="loading">Buscando seus servidores...</div>';
+    serversGrid.innerHTML = '<div class="loading">Buscando servidores na Aternos...</div>';
     serversSection.style.display = 'block';
     
     try {
-        // Chamando sua API da Vercel
         const response = await fetch(`/api/servidores?cookie=${encodeURIComponent(sessionCookie)}`);
         const data = await response.json();
         
         if (data.success) {
             displayServers(data.servers);
-            addActivityLog('✅ ' + data.servers.length + ' servidores carregados');
+            addActivityLog(`✅ ${data.servers.length} servidores encontrados.`);
         } else {
-            serversGrid.innerHTML = `<div style="color:#f56565">Erro: ${data.error}</div>`;
+            serversGrid.innerHTML = `<div class="error">Erro: ${data.error}</div>`;
         }
     } catch (error) {
-        serversGrid.innerHTML = `<div style="color:#f56565">Falha ao conectar: ${error.message}</div>`;
+        serversGrid.innerHTML = `<div class="error">Falha na conexão: ${error.message}</div>`;
     }
 }
 
-// Exibir servidores no grid
+// Exibir os cards (usando as classes do seu CSS)
 function displayServers(servers) {
     serversGrid.innerHTML = '';
-    
     servers.forEach(server => {
         const card = document.createElement('div');
         card.className = 'server-card';
         card.innerHTML = `
-            <div style="font-weight:bold">${server.name || 'Sem nome'}</div>
-            <div style="font-size:0.8em; color:#aaa">ID: ${server.id}</div>
-            <span class="status-badge ${server.online ? 'status-online' : 'status-offline'}">
+            <div class="server-name">${server.name || 'Server'}</div>
+            <div class="server-id">ID: ${server.id}</div>
+            <div class="server-software">${server.software || 'Vanilla'}</div>
+            <span class="server-status-badge ${server.online ? 'status-online' : 'status-offline'}">
                 ${server.online ? '🟢 Online' : '🔴 Offline'}
             </span>
         `;
-        
-        card.addEventListener('click', () => selectServer(server, card));
+        card.onclick = () => selectServer(server, card);
         serversGrid.appendChild(card);
     });
 }
 
-// Selecionar um servidor
+// Selecionar Servidor
 function selectServer(server, card) {
     document.querySelectorAll('.server-card').forEach(c => c.classList.remove('selected'));
     card.classList.add('selected');
     
     selectedServer = server;
     
-    // Atualiza os nomes no painel de controle
-    const targetName = document.getElementById('targetName'); // ID do seu HTML
-    if(targetName) targetName.textContent = server.name;
+    // Atualiza Painel de Detalhes
+    document.getElementById('selectedServerName').textContent = server.name;
+    document.getElementById('selectedServerId').textContent = server.id;
+    document.getElementById('serverStatus').textContent = server.online ? 'Online' : 'Offline';
+    document.getElementById('serverStatus').className = `status-badge ${server.online ? 'status-online' : 'status-offline'}`;
+    document.getElementById('serverPlayers').textContent = server.players || '0/20';
+    document.getElementById('serverSoftware').textContent = server.software || 'Aternos';
     
     controlSection.style.display = 'block';
-    addActivityLog(`📌 Selecionado: ${server.name}`);
+    logsSection.style.display = 'block';
+    addActivityLog(`📌 Servidor selecionado: ${server.name}`);
 }
 
-// Ligar Servidor
+// Funções de Controle (Start/Stop)
 async function startServer() {
     if (!selectedServer) return;
-    
-    try {
-        addActivityLog('▶️ Iniciando servidor...');
-        const response = await fetch(`/api/control?action=start&server=${selectedServer.id}&cookie=${encodeURIComponent(sessionCookie)}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            addActivityLog('✅ Comando enviado! Aguarde o início.');
-            setTimeout(refreshStatus, 5000); // Atualiza após 5 seg
-        } else {
-            addActivityLog(`❌ Erro: ${data.error}`, 'error');
-        }
-    } catch (error) {
-        addActivityLog(`❌ Erro: ${error.message}`, 'error');
-    }
+    addActivityLog(`▶️ Iniciando ${selectedServer.name}...`);
+    const res = await fetch(`/api/control?action=start&server=${selectedServer.id}&cookie=${encodeURIComponent(sessionCookie)}`);
+    const data = await res.json();
+    if(data.success) addActivityLog("✅ Comando de início enviado!");
+    else addActivityLog(`❌ Erro: ${data.error}`);
 }
 
-// Desligar Servidor
 async function stopServer() {
-    if (!selectedServer) return;
-    if (!confirm('Tem certeza que quer desligar?')) return;
-    
-    try {
-        addActivityLog('⏹️ Desligando servidor...');
-        const response = await fetch(`/api/control?action=stop&server=${selectedServer.id}&cookie=${encodeURIComponent(sessionCookie)}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            addActivityLog('✅ Servidor desligado');
-            refreshStatus();
-        }
-    } catch (error) {
-        addActivityLog(`❌ Erro: ${error.message}`, 'error');
+    if (!selectedServer || !confirm("Desligar o servidor agora?")) return;
+    addActivityLog(`⏹️ Desligando ${selectedServer.name}...`);
+    const res = await fetch(`/api/control?action=stop&server=${selectedServer.id}&cookie=${encodeURIComponent(sessionCookie)}`);
+    const data = await res.json();
+    if(data.success) addActivityLog("✅ Servidor desligado.");
+}
+
+// Lógica do Bot Always Online
+document.getElementById('alwaysOnlineToggle').addEventListener('change', (e) => {
+    botActive = e.target.checked;
+    if (botActive) {
+        botStatus.style.display = 'block';
+        addActivityLog("🤖 Bot Always Online ATIVADO");
+        runBot();
+    } else {
+        botStatus.style.display = 'none';
+        clearTimeout(botInterval);
+        addActivityLog("🤖 Bot Always Online DESATIVADO");
     }
-}
+});
 
-// Atualizar Status
-async function refreshStatus() {
-    if (!selectedServer) return;
+async function runBot() {
+    if (!botActive || !selectedServer) return;
+    
     try {
-        const response = await fetch(`/api/control?action=status&server=${selectedServer.id}&cookie=${encodeURIComponent(sessionCookie)}`);
-        const data = await response.json();
-        if (data.success) {
-            addActivityLog(`🔄 Status atual: ${data.status.online ? 'Online' : 'Offline'}`);
-            loadServers(); // Recarrega a lista para atualizar as cores
-        }
-    } catch (e) { console.error(e); }
+        const res = await fetch(`/api/control?action=status&server=${selectedServer.id}&cookie=${encodeURIComponent(sessionCookie)}`);
+        const data = await res.json();
+        
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        const time = new Date().toLocaleTimeString();
+        
+        entry.innerHTML = `<span class="time">[${time}]</span> <span class="action">Verificação: ${data.status.online ? 'Online' : 'Offline'}</span>`;
+        botLog.prepend(entry);
+        
+        document.getElementById('lastAction').textContent = "Status verificado";
+        document.getElementById('nextCheck').textContent = new Date(Date.now() + 30000).toLocaleTimeString();
+        
+    } catch (e) { console.error("Erro no bot", e); }
+    
+    botInterval = setTimeout(runBot, 30000); // Roda a cada 30 segundos
 }
 
-// Log de atividades
-function addActivityLog(message, type = 'info') {
+function addActivityLog(message) {
     const entry = document.createElement('div');
-    entry.className = 'log-entry';
+    entry.className = 'activity-entry';
     const time = new Date().toLocaleTimeString();
-    const color = type === 'error' ? '#f56565' : '#4299e1';
-    
-    entry.innerHTML = `<span style="color:#48bb78">[${time}]</span> <span style="color:${color}">${message}</span>`;
-    
-    activityLog.appendChild(entry);
-    activityLog.scrollTop = activityLog.scrollHeight;
+    entry.innerHTML = `<span class="time">[${time}]</span> ${message}`;
+    activityLogs.prepend(entry);
 }
